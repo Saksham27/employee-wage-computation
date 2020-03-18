@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 #CONSTANTS
 WAGE_PER_HOUR=20
@@ -24,7 +24,7 @@ workingHoursForMonth=0
 days=0
 
 # data structure to store dailt wage
-declare -a dailyWage
+declare -A dailyWage
 
 # function to check if employee is present or absent
 # local variables
@@ -113,11 +113,15 @@ do
 	fi
 
 	dailyWage[$days]=$wageForADay # storing daily wage
-	
+
 	(( days++ )) # increasing a day
 
 	employeeMonthlyWage=$(( $employeeMonthlyWage+$wageForADay ))
 done
 
-echo "Employee Wage for the month : $employeeMonthlyWage"
-echo ${dailyWage[@]}
+
+for var in ${!dailyWage[@]} # printing the dailywage alongside its day
+do
+	echo "Day "$var : ${dailyWage[$var]}
+done
+echo "Employee Wage for the month : $employeeMonthlyWage" # printing total monthly wage earned by employee
