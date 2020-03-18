@@ -9,19 +9,21 @@ PART_TIME_EMPLOYEE=0
 EMPLOYEE_PRESENT=1
 EMPLOYEE_ABSENT=0
 MONTHLY_WORKING_DAYS=20
+MONTHLY_MAX_WORKING_HOURS=100
 
 #variables
-isEmployeePresent
-wageForADay
-employeeType
-employeeWorkingTime
-workingHoursForDay
-daysEmployeeWorkedForMonth=0
+isEmployeePresent=0
+wageForADay=0
+employeeType=0
+employeeWorkingTime=0
+workingHoursForDay=0
+daysEmployeeWorkedInMonth=0
 employeeMonthlyWage=0
+workingHoursForMonth=0
 
 # function to check if employee is present or absent
 # local variables
-counter
+counter=0
 
 function employeeAttendance() {
 	local counter=$(( RANDOM%2 ))
@@ -43,7 +45,7 @@ function dailyEmployeeWage() {
 
 # fucntion to calculate employee type, Full time or Part time
 # local variables
-empType
+empType=0
 
 function employeeType() {
 	local empType=$((RANDOM%2))
@@ -62,7 +64,7 @@ function employeeType() {
 
 echo "** Welcome to Employee Wage Computation **"
 
-while [ $daysEmployeeWorkedForMonth -lt $MONTHLY_WORKING_DAYS ]
+while [ $daysEmployeeWorkedInMonth -lt $MONTHLY_WORKING_DAYS ] && [ $workingHoursForMonth -lt $MONTHLY_MAX_WORKING_HOURS ] # calculating wage for max of 100 hours or 20 days of work done
 do
 	isEmployeePresent=$( employeeAttendance )
 
@@ -79,13 +81,22 @@ do
 				;;
 		esac
 
+		if [ $(( $MONTHLY_MAX_WORKING_HOURS-$workingHoursForMonth )) -lt $FULL_DAY_HOUR ] # tackling situation where perosn has worked for 96 hours but he comes next day for Full day(8 hours), he will still be paid only for 4 hours
+		then
+			workingHoursForDay=$PART_TIME_HOUR
+		fi
+
 		wageForADay=$( dailyEmployeeWage $WAGE_PER_HOUR $workingHoursForDay )  # calculating a day's wage for the employee if present
+
+		(( daysEmployeeWorkedInMonth++ )) # incrementing worked day by 1 
+
+		workingHoursForMonth=$(( $workingHoursForMonth+$workingHoursForDay )) # adding hours worked in day to monthly worked hours
+
 	else
 		wageForADay=0 # caculating a day;s wage for employee if absent
 	fi
 
 	employeeMonthlyWage=$(( $employeeMonthlyWage+$wageForADay))
-	(( daysEmployeeWorkedForMonth++ ))
 done
 
 echo "Employee Wage for the month : $employeeMonthlyWage"
