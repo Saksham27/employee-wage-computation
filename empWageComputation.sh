@@ -10,6 +10,7 @@ EMPLOYEE_PRESENT=1
 EMPLOYEE_ABSENT=0
 MONTHLY_WORKING_DAYS=20
 MONTHLY_MAX_WORKING_HOURS=100
+DAYS_IN_MONTH=30
 
 #variables
 isEmployeePresent=0
@@ -20,6 +21,10 @@ workingHoursForDay=0
 daysEmployeeWorkedInMonth=0
 employeeMonthlyWage=0
 workingHoursForMonth=0
+days=0
+
+# data structure to store dailt wage
+declare -a dailyWage
 
 # function to check if employee is present or absent
 # local variables
@@ -60,6 +65,7 @@ function employeeType() {
 }
 
 # function to get working hours
+# param1 : employee working time, part time or full time
 # local variable
 workhours=0
 
@@ -86,7 +92,7 @@ function getWorkingHoursForDay() {
 
 echo "** Welcome to Employee Wage Computation **"
 
-while [ $daysEmployeeWorkedInMonth -lt $MONTHLY_WORKING_DAYS ] && [ $workingHoursForMonth -lt $MONTHLY_MAX_WORKING_HOURS ] # calculating wage for max of 100 hours or 20 days of work done
+while [ $daysEmployeeWorkedInMonth -lt $MONTHLY_WORKING_DAYS ] && [ $workingHoursForMonth -lt $MONTHLY_MAX_WORKING_HOURS ] && [ $days -lt $DAYS_IN_MONTH ] # calculating wage for max of 100 hours or 20 days of work done or 30 days aka month gets over
 do
 	isEmployeePresent=$( employeeAttendance )
 
@@ -106,7 +112,12 @@ do
 		wageForADay=0 # calcuating a day's wage for employee if absent
 	fi
 
+	dailyWage[$days]=$wageForADay # storing daily wage
+	
+	(( days++ )) # increasing a day
+
 	employeeMonthlyWage=$(( $employeeMonthlyWage+$wageForADay ))
 done
 
 echo "Employee Wage for the month : $employeeMonthlyWage"
+echo ${dailyWage[@]}
