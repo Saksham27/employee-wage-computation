@@ -3,12 +3,14 @@
 #CONSTANTS
 WAGE_PER_HOUR=20
 FULL_DAY_HOUR=8
+PART_TIME_HOUR=4
+FULL_TIME_EMPLOYEE=1
+PART_TIME_EMPLOYEE=0
 
 #variables
 isEmployeePresent
 wageForADay
-
-echo "** Welcome to Employee Wage Computation **"
+employeeType
 
 # function to check if employee is present or absent
 function employeeAttendance() {
@@ -28,6 +30,23 @@ function dailyEmployeeWage() {
 	echo $(( $1*$2 ))
 }
 
+# fucntion to calculate employee type, Full time or Part time
+function employeeType() {
+	local empType=$((RANDOM%2))
+	if [ $empType -eq $FULL_TYPE_EMPLOYEE ]
+	then
+		echo "fulltime"
+	fi
+	if [ $empType -eq $PART_TIME_EMPLOYEE ]
+	then
+		echo "parttime"
+	fi
+}
+
+
+############# main program ############
+
+echo "** Welcome to Employee Wage Computation **"
 
 isEmployeePresent=$( employeeAttendance )
 
