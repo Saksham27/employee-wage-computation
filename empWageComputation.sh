@@ -59,6 +59,28 @@ function employeeType() {
 	fi
 }
 
+# function to get working hours
+# local variable
+workhours=0
+
+function getWorkingHoursForDay() {
+	case $employeeWorkingTime in  # setting working hours for a day according to employee type
+		fulltime)
+			workHours=$FULL_DAY_HOUR
+			;;
+		parttime)
+			workHours=$PART_TIME_HOUR
+			;;
+	esac
+
+	if [ $(( $MONTHLY_MAX_WORKING_HOURS-$workingHoursForMonth )) -lt $FULL_DAY_HOUR ] # tackling situation where perosn has worked for 96 hours but he comes next day for Full day(8 hours), he will still be paid only for 4 hours
+	then
+		workHours=$PART_TIME_HOUR
+	fi
+
+	echo $workHours
+}
+
 
 ############# main program ############
 
@@ -72,19 +94,7 @@ do
 	then
 		employeeWorkingTime=$( employeeType )  # setting employee's work time, part time or full time accordingly
 
-		case $employeeWorkingTime in  # setting working hours for a day according to employee type
-			fulltime)
-				workingHoursForDay=$FULL_DAY_HOUR
-				;;
-			parttime)
-				workingHoursForDay=$PART_TIME_HOUR
-				;;
-		esac
-
-		if [ $(( $MONTHLY_MAX_WORKING_HOURS-$workingHoursForMonth )) -lt $FULL_DAY_HOUR ] # tackling situation where perosn has worked for 96 hours but he comes next day for Full day(8 hours), he will still be paid only for 4 hours
-		then
-			workingHoursForDay=$PART_TIME_HOUR
-		fi
+		workingHoursForDay=$( getWorkingHoursForDay $employeeWorkingTime ) # getting working hours for day
 
 		wageForADay=$( dailyEmployeeWage $WAGE_PER_HOUR $workingHoursForDay )  # calculating a day's wage for the employee if present
 
@@ -93,10 +103,10 @@ do
 		workingHoursForMonth=$(( $workingHoursForMonth+$workingHoursForDay )) # adding hours worked in day to monthly worked hours
 
 	else
-		wageForADay=0 # caculating a day;s wage for employee if absent
+		wageForADay=0 # calcuating a day's wage for employee if absent
 	fi
 
-	employeeMonthlyWage=$(( $employeeMonthlyWage+$wageForADay))
+	employeeMonthlyWage=$(( $employeeMonthlyWage+$wageForADay ))
 done
 
 echo "Employee Wage for the month : $employeeMonthlyWage"
