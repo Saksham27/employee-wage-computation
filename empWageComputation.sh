@@ -6,7 +6,7 @@ FULL_DAY_HOUR=8
 PART_TIME_HOUR=4
 FULL_TIME_EMPLOYEE=1
 PART_TIME_EMPLOYEE=0
-EMPLOYEE_PRESENT=1
+EMPLOYEE_PRESENT=1 # so EMPLOYEE_ABSENT will be 0
 MONTHLY_WORKING_DAYS=20
 MONTHLY_MAX_WORKING_HOURS=100
 DAYS_IN_MONTH=30
@@ -15,7 +15,6 @@ DAYS_IN_MONTH=30
 isEmployeePresent=0
 wageForADay=0
 employeeType=0
-employeeWorkingTime=0
 workingHoursForDay=0
 daysEmployeeWorkedInMonth=0
 employeeMonthlyWage=0
@@ -51,29 +50,18 @@ function dailyEmployeeWage() {
 # local variables
 empType=0
 
-function employeeType() {
-	local empType=$((RANDOM%2))
-	if [ $empType -eq $FULL_TIME_EMPLOYEE ]
-	then
-		echo "fulltime"
-	fi
-	if [ $empType -eq $PART_TIME_EMPLOYEE ]
-	then
-		echo "parttime"
-	fi
-}
-
 # function to get working hours
 # param1 : employee working time, part time or full time
 # local variable
 workhours=0
 
 function getWorkingHoursForDay() {
-	case $employeeWorkingTime in  # setting working hours for a day according to employee type
-		fulltime)
+	local empType=$((RANDOM%2))
+	case $empType in  # setting working hours for a day according to employee type
+		$FULL_TIME_EMPLOYEE)
 			workHours=$FULL_DAY_HOUR
 			;;
-		parttime)
+		$PART_TIME_EMPLOYEE)
 			workHours=$PART_TIME_HOUR
 			;;
 	esac
@@ -97,9 +85,7 @@ do
 
 	if [ $isEmployeePresent = "present" ]  # cheking if employee is present or not
 	then
-		employeeWorkingTime=$( employeeType )  # setting employee's work time, part time or full time accordingly
-
-		workingHoursForDay=$( getWorkingHoursForDay $employeeWorkingTime ) # getting working hours for day
+		workingHoursForDay=$( getWorkingHoursForDay ) # getting working hours for day according to full time or part time employee
 
 		wageForADay=$( dailyEmployeeWage $WAGE_PER_HOUR $workingHoursForDay )  # calculating a day's wage for the employee if present
 
@@ -119,8 +105,3 @@ do
 done
 
 
-for var in ${!dailyWage[@]} # printing the dailywage alongside its day
-do
-	echo "Day "$var : ${dailyWage[$var]}
-done
-echo "Employee Wage for the month : $employeeMonthlyWage" # printing total monthly wage earned by employee
